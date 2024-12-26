@@ -1,0 +1,73 @@
+body {
+    transition: background-color 0.3s ease;
+}
+
+.content-view {
+    transition: opacity 0.3s ease;
+}
+
+.content-view.d-none {
+    display: none !important;
+}
+
+.card {
+    height: calc(100vh - 100px);
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.list-group {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.lyrics-content {
+    white-space: pre-wrap;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 1rem;
+}
+
+.song-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.song-item:hover {
+    background-color: var(--bs-primary-bg-subtle);
+    border-left-color: var(--bs-primary);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bs-body-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-primary-darker);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        height: auto;
+        max-height: 90vh;
+        margin: 1rem;
+    }
+    
+    .list-group, .lyrics-content {
+        max-height: 70vh;
+    }
+}
