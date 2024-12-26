@@ -77,6 +77,27 @@ def get_lyrics():
     
     return jsonify({'error': 'Lyrics not found'}), 404
 
+@app.route('/api/delete_song', methods=['POST'])
+def delete_song():
+    """Delete a song file from the songs directory"""
+    song_name = request.json.get('song')
+    if not song_name:
+        return jsonify({'error': 'No song name provided'}), 400
+    
+    # Add .txt extension if not present
+    if not song_name.endswith('.txt'):
+        song_name = f"{song_name}.txt"
+    
+    file_path = os.path.join(SONGS_DIR, song_name)
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            return jsonify({'success': True, 'message': f'Successfully deleted {song_name}'})
+        else:
+            return jsonify({'error': 'Song file not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.after_request
 def add_header(response):
     """Add headers to prevent caching."""

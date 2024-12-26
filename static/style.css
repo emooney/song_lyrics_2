@@ -23,6 +23,7 @@ body {
 
 .lyrics-content {
     white-space: pre-wrap;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-y: auto;
     max-height: calc(100vh - 200px);
     font-size: 1.1rem;
@@ -34,11 +35,34 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.song-item .song-title {
+    flex-grow: 1;
+    text-align: left;
+    margin-right: 10px;
+}
+
+.song-item .delete-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    color: var(--bs-danger);
 }
 
 .song-item:hover {
     background-color: var(--bs-primary-bg-subtle);
     border-left-color: var(--bs-primary);
+}
+
+.song-item:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:hover {
+    color: var(--bs-danger) !important;
 }
 
 /* Custom scrollbar */

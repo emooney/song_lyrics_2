@@ -61,11 +61,49 @@ document.addEventListener('DOMContentLoaded', function() {
         filteredSongs.forEach(song => {
             const item = document.createElement('button');
             item.className = 'list-group-item list-group-item-action song-item';
-            item.textContent = song;
-            item.onclick = () => {
+            
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'song-title';
+            titleSpan.textContent = song;
+            titleSpan.onclick = (e) => {
+                e.stopPropagation();
                 fetchLyrics(song);
                 showLyricsView();
             };
+            
+            const deleteBtn = document.createElement('i');
+            deleteBtn.className = 'bi bi-trash delete-btn';
+            deleteBtn.onclick = async (e) => {
+                e.stopPropagation();
+                if (confirm(`Are you sure you want to delete "${song}"?`)) {
+                    try {
+                        const response = await fetch('/api/delete_song', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ song: song })
+                        });
+                        
+                        if (response.ok) {
+                            // Remove the song from our list and refresh display
+                            songs = songs.filter(s => s !== song);
+                            displayFilteredSongs(songs.filter(s => 
+                                s.toLowerCase().includes(songSearch.value.toLowerCase())
+                            ));
+                        } else {
+                            const data = await response.json();
+                            alert(data.error || 'Failed to delete song');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting song:', error);
+                        alert('Failed to delete song');
+                    }
+                }
+            };
+            
+            item.appendChild(titleSpan);
+            item.appendChild(deleteBtn);
             songList.appendChild(item);
         });
     }
