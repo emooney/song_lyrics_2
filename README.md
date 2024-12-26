@@ -43,6 +43,8 @@ song_lyrics_2/
 
 ## Setup and Running
 
+### Local Setup
+
 1. Install dependencies:
    ```bash
    pip install -r requirements.txt
@@ -57,6 +59,32 @@ song_lyrics_2/
    ```
    http://localhost:5000
    ```
+
+### Docker Setup
+
+1. Using Docker Compose (recommended):
+   ```bash
+   docker-compose up --build
+   ```
+
+2. Or using Docker directly:
+   ```bash
+   # Build the image
+   docker build -t lyrics-finder .
+
+   # Run the container
+   docker run -p 5000:5000 -v lyrics_data:/app/songs lyrics-finder
+   ```
+
+3. Open in browser:
+   ```
+   http://localhost:5000
+   ```
+
+The Docker setup includes:
+- Persistent volume for lyrics storage
+- Production-ready configuration
+- Automatic container rebuilding when needed
 
 ## Usage
 

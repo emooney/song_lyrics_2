@@ -37,3 +37,11 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+.docker/
+docker-compose.override.yml
+*.env
+
+# Container volumes
+lyrics_data/

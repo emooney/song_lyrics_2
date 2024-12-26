@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  lyrics-finder:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - lyrics_data:/app/songs
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+
+volumes:
+  lyrics_data:
+    driver: local
