@@ -22,13 +22,22 @@ body {
 }
 
 .lyrics-content {
+    padding: 10px;
+    line-height: 1.6;
     white-space: pre-wrap;
+    font-size: 1.1rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-y: auto;
     max-height: calc(100vh - 200px);
-    font-size: 1.1rem;
+}
+
+#lyricsTextarea {
+    padding: 10px;
     line-height: 1.6;
-    padding: 1rem;
+    font-size: 1.1rem;
+    font-family: inherit;
+    resize: none;
+    height: calc(100vh - 250px);
 }
 
 .song-item {
