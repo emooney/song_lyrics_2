@@ -98,6 +98,24 @@ def delete_song():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/lyrics/edit', methods=['POST'])
+def edit_lyrics():
+    """Edit lyrics for a song"""
+    data = request.get_json()
+    song_name = data.get('song')
+    new_lyrics = data.get('lyrics')
+    
+    if not song_name or not new_lyrics:
+        return jsonify({'error': 'Missing song name or lyrics'}), 400
+        
+    try:
+        file_path = os.path.join(SONGS_DIR, f"{song_name}.txt")
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(new_lyrics)
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.after_request
 def add_header(response):
     """Add headers to prevent caching."""

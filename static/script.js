@@ -5,22 +5,41 @@ document.addEventListener('DOMContentLoaded', function() {
     const lyricsDisplay = document.getElementById('lyricsDisplay');
     const themeToggle = document.getElementById('themeToggle');
     const backButton = document.getElementById('backButton');
+    const editButton = document.getElementById('editButton');
+    const saveButton = document.getElementById('saveButton');
+    const lyricsEdit = document.getElementById('lyricsEdit');
+    const lyricsTextarea = document.getElementById('lyricsTextarea');
 
     let songs = [];
+    let currentSong = null;
 
     // Navigation functions
     function showLyricsView() {
         songList.classList.add('d-none');
         lyricsDisplay.classList.remove('d-none');
         backButton.classList.remove('d-none');
+        editButton.classList.remove('d-none');
+        saveButton.classList.add('d-none');
+        lyricsEdit.classList.add('d-none');
     }
 
     function showSongListView() {
         lyricsDisplay.classList.add('d-none');
         songList.classList.remove('d-none');
         backButton.classList.add('d-none');
+        editButton.classList.add('d-none');
+        saveButton.classList.add('d-none');
+        lyricsEdit.classList.add('d-none');
         songSearch.value = '';
         displayFilteredSongs(songs);
+    }
+
+    function showEditView() {
+        lyricsDisplay.classList.add('d-none');
+        lyricsEdit.classList.remove('d-none');
+        editButton.classList.add('d-none');
+        saveButton.classList.remove('d-none');
+        lyricsTextarea.value = lyricsDisplay.textContent;
     }
 
     // Theme toggling
@@ -110,39 +129,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchLyrics(searchTerm) {
         try {
-            // Parse search term for artist if provided
-            let song = searchTerm;
-            let artist = '';
-            
-            if (searchTerm.toLowerCase().includes(' by ')) {
-                [song, artist] = searchTerm.split(/\s+by\s+/i);
-            }
-
-            const response = await fetch(`/api/lyrics?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
+            showLyricsView();
+            const response = await fetch('/api/lyrics?song=' + encodeURIComponent(searchTerm));
             const data = await response.json();
             
-            if (response.ok) {
-                let sourceText = `Source: ${data.source}`;
-                if (data.source === 'api' && data.saved_as) {
-                    sourceText += ` (Saved locally as "${data.saved_as}")`;
-                }
-                
-                lyricsDisplay.innerHTML = `
-                    <h3 class="mb-4">${song}${artist ? ` by ${artist}` : ''}</h3>
-                    <p>${data.lyrics.replace(/\n/g, '<br>')}</p>
-                    <small class="text-muted">${sourceText}</small>
-                `;
-                
-                // Refresh the song list if we saved a new song
-                if (data.source === 'api' && data.saved_as) {
-                    fetchSongs();
-                }
+            if (data.error) {
+                lyricsDisplay.innerHTML = `<p class="text-danger">${data.error}</p>`;
             } else {
-                lyricsDisplay.innerHTML = `<p class="text-center text-danger mt-3">Lyrics not found. Try searching with "song by artist"</p>`;
+                currentSong = searchTerm;
+                lyricsDisplay.textContent = data.lyrics;
             }
         } catch (error) {
             console.error('Error fetching lyrics:', error);
-            lyricsDisplay.innerHTML = `<p class="text-center text-danger mt-3">Error loading lyrics</p>`;
+            lyricsDisplay.innerHTML = '<p class="text-danger">Error fetching lyrics</p>';
+        }
+    }
+
+    async function saveLyrics() {
+        if (!currentSong) return;
+        
+        try {
+            const response = await fetch('/api/lyrics/edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    song: currentSong,
+                    lyrics: lyricsTextarea.value
+                })
+            });
+            
+            if (response.ok) {
+                lyricsDisplay.textContent = lyricsTextarea.value;
+                showLyricsView();
+            } else {
+                const data = await response.json();
+                alert('Error saving lyrics: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error saving lyrics:', error);
+            alert('Error saving lyrics: ' + error.message);
         }
     }
 
@@ -164,9 +191,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (backButton) {
-        backButton.addEventListener('click', showSongListView);
-    }
+    if (backButton) backButton.addEventListener('click', showSongListView);
+    if (editButton) editButton.addEventListener('click', showEditView);
+    if (saveButton) saveButton.addEventListener('click', saveLyrics);
 
     // Initialize
     fetchSongs();
