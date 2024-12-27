@@ -130,14 +130,27 @@ document.addEventListener('DOMContentLoaded', function() {
     async function fetchLyrics(searchTerm) {
         try {
             showLyricsView();
-            const response = await fetch('/api/lyrics?song=' + encodeURIComponent(searchTerm));
+            
+            // Parse search term for artist if provided
+            let song = searchTerm;
+            let artist = '';
+            
+            if (searchTerm.toLowerCase().includes(' by ')) {
+                [song, artist] = searchTerm.split(/\s+by\s+/i);
+            }
+
+            const response = await fetch(`/api/lyrics?song=${encodeURIComponent(song)}&artist=${encodeURIComponent(artist)}`);
             const data = await response.json();
             
             if (data.error) {
-                lyricsDisplay.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                lyricsDisplay.innerHTML = `<p class="text-danger">${data.error}</p><p class="text-muted">Try searching with "song by artist"</p>`;
             } else {
                 currentSong = searchTerm;
                 lyricsDisplay.textContent = data.lyrics;
+                if (data.source === 'api') {
+                    // Refresh the song list if we saved a new song
+                    fetchSongs();
+                }
             }
         } catch (error) {
             console.error('Error fetching lyrics:', error);
