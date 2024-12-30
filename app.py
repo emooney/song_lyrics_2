@@ -21,8 +21,8 @@ def get_local_songs():
     return sorted(songs)
 
 def save_lyrics_to_file(song_title, artist, lyrics):
-    """Save lyrics to a local file using the format 'song_title - artist.txt'"""
-    filename = f"{song_title} - {artist}.txt"
+    """Save lyrics to a local file using the format '[songTitle]-[artist].txt'"""
+    filename = f"{song_title}-{artist}.txt"
     filepath = os.path.join(SONGS_DIR, filename)
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(lyrics)
@@ -52,16 +52,12 @@ def get_lyrics():
     artist = request.args.get('artist', '')
     
     # First try to get from local files
-    # Check if the file exists either as just song_name or song_name - artist
-    local_paths = [
-        os.path.join(SONGS_DIR, f"{song_name}.txt"),
-        os.path.join(SONGS_DIR, f"{song_name} - {artist}.txt")
-    ]
+    # Check if the file exists in the format [songTitle]-[artist].txt
+    local_path = os.path.join(SONGS_DIR, f"{song_name}-{artist}.txt")
     
-    for path in local_paths:
-        if os.path.exists(path):
-            with open(path, 'r', encoding='utf-8') as f:
-                return jsonify({'lyrics': f.read(), 'source': 'local'})
+    if os.path.exists(local_path):
+        with open(local_path, 'r', encoding='utf-8') as f:
+            return jsonify({'lyrics': f.read(), 'source': 'local'})
     
     # If not found locally and artist is provided, try API
     if artist:
